@@ -3,7 +3,9 @@
 Implementing Basic Authentication
 """
 from api.v1.auth.auth import Auth
+from typing import Tuple
 import base64
+import re
 
 
 class BasicAuth(Auth):
@@ -30,3 +32,15 @@ class BasicAuth(Auth):
             except Exception:
                 pass
         return None
+
+    def extract_user_credentials(self,
+                                 decoded_base64_authorization_header: str
+                                 ) -> Tuple[str, str]:
+        """Extracts and returs user credetials which are email and password"""
+        decoded_base = decoded_base64_authorization_header
+        if decoded_base is not None and type(decoded_base) == str:
+            if ':' in decoded_base:
+                email = re.match('(.+):', decoded_base)[1]
+                password = re.match('.+:(.+)', decoded_base)[1]
+                return (email, password)
+        return (None, None)
